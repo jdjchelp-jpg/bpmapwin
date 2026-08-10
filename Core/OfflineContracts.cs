@@ -1,3 +1,5 @@
+using System.IO;
+
 namespace OfflineMaps.Win.Core;
 
 public enum TravelProfile { Driving, Walking, Cycling }
