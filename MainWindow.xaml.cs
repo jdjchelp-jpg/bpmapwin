@@ -18,7 +18,12 @@ public partial class MainWindow : Window
         _map = new OfflineMapControl(package.Directory, package.TilesPath);
         _map.Initialize();
         MapStatus.Text = _map.Status;
-        if (package.TilesPath is not null && File.Exists(Path.Combine(AppContext.BaseDirectory, "MapLibreBridge.dll")))
+        var bridgePath = new[]
+        {
+            Path.Combine(AppContext.BaseDirectory, "MapLibreBridge.dll"),
+            Path.Combine(AppContext.BaseDirectory, "Native", "MapLibreBridge.dll")
+        }.FirstOrDefault(File.Exists);
+        if (package.TilesPath is not null && bridgePath is not null)
             MapSurface.Child = new NativeMapHost { Package = package };
         if (package.SearchDatabasePath is not null) _search = new OfflineSearchService(package.SearchDatabasePath);
     }
