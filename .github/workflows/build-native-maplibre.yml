@@ -1,0 +1,43 @@
+name: Build native MapLibre bridge
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-native:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install CMake and Ninja
+        uses: lukka/get-cmake@latest
+      - name: Checkout MapLibre Native
+        shell: pwsh
+        run: git clone --recurse-submodules --depth 1 https://github.com/maplibre/maplibre-native.git $env:RUNNER_TEMP\maplibre-native
+      - name: Configure MapLibre Native
+        shell: pwsh
+        run: |
+          Set-Location $env:RUNNER_TEMP\maplibre-native
+          cmake --list-presets
+          cmake --preset windows-vcpkg
+      - name: Build MapLibre Native
+        shell: pwsh
+        run: cmake --build $env:RUNNER_TEMP\maplibre-native\build-windows-vcpkg --config Release --target ALL_BUILD
+      - name: Configure bridge
+        shell: pwsh
+        run: |
+          & "$env:VCPKG_INSTALLATION_ROOT\vcpkg.exe" install sqlite3:x64-windows
+          cmake -S Native -B Native\build -DCMAKE_BUILD_TYPE=Release -A x64 -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT\scripts\buildsystems\vcpkg.cmake"
+      - name: Build bridge
+        shell: pwsh
+        run: cmake --build Native\build --config Release
+      - name: Upload native artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: maplibre-native-windows
+          path: |
+            Native/build/Release/MapLibreBridge.dll
+            ${{ runner.temp }}/maplibre-native/build-windows-vcpkg/bin/Release/*.dll
+          if-no-files-found: warn
