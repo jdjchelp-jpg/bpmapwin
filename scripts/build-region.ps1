@@ -19,11 +19,13 @@ Require-Command "python"
 
 New-Item -ItemType Directory -Force -Path $OutputRoot | Out-Null
 $searchGeoJson = Join-Path $OutputRoot "$RegionId-search.geojson"
+$searchPbf = Join-Path $OutputRoot "$RegionId-search.osm.pbf"
 $tiles = Join-Path $OutputRoot "$RegionId.mbtiles"
 $searchDb = Join-Path $OutputRoot "$RegionId-search.sqlite"
 
 Write-Host "[1/3] Exporting searchable OSM names and POIs..."
-osmium tags-filter $InputPbf nwr/name -o $searchGeoJson -f geojson --overwrite
+osmium tags-filter $InputPbf nwr/name -o $searchPbf --overwrite
+osmium export $searchPbf -o $searchGeoJson --overwrite
 python (Join-Path $PSScriptRoot 'import-search.py') $searchGeoJson $searchDb
 
 Write-Host "[2/3] Building MapLibre vector tiles..."
