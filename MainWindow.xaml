@@ -33,7 +33,7 @@
     <Grid Grid.Column="1">
       <Border Margin="16" CornerRadius="10" Background="#DCE6EF" BorderBrush="#B8C9D8" BorderThickness="1">
         <Grid x:Name="MapHost">
-          <Canvas x:Name="MapCanvas" Background="#DCE6EF"/>
+          <Border x:Name="MapSurface" Background="#DCE6EF"/>
           <Border HorizontalAlignment="Center" VerticalAlignment="Center" Background="#F8FAFC" Padding="22" CornerRadius="8" Opacity="0.94">
             <StackPanel>
               <TextBlock Text="Offline map ready" FontSize="22" FontWeight="SemiBold" Foreground="#12304A" HorizontalAlignment="Center"/>
