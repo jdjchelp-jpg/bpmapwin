@@ -77,9 +77,13 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with: { dotnet-version: '8.0.x' }
       - uses: actions/download-artifact@v4
-        with: { name: region-package, path: Maps/${{ inputs.region }} }
+        with:
+          name: region-package
+          path: "Maps/${{ inputs.region }}"
       - uses: actions/download-artifact@v4
-        with: { name: native-bridge, path: Native }
+        with:
+          name: native-bridge
+          path: Native
       - name: Publish WPF app
         shell: pwsh
         run: dotnet publish .\OfflineMaps.Win.csproj -c Release -r win-x64 --self-contained false -o .\publish
