@@ -1,12 +1,13 @@
 param(
     [string]$RegionId = "jamaica",
     [string]$InputPbf = "$(Join-Path $PSScriptRoot '..\Maps\jamaica.osm.pbf')",
-    [string]$OutputRoot = "$(Join-Path $PSScriptRoot '..\Maps\jamaica')",
+    [string]$OutputRoot = "",
     [string]$TilemakerConfig = "$(Join-Path $PSScriptRoot 'tilemaker-config.json')",
     [string]$TilemakerProcess = "$(Join-Path $PSScriptRoot 'tilemaker-process.lua')"
 )
 $ErrorActionPreference = 'Stop'
 $PSNativeCommandUseErrorActionPreference = $true
+if ([string]::IsNullOrWhiteSpace($OutputRoot)) { $OutputRoot = Join-Path $PSScriptRoot "..\Maps\$RegionId" }
 
 function Require-Command([string]$Name) {
     if (-not (Get-Command $Name -ErrorAction SilentlyContinue)) {
