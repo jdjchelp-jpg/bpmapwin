@@ -17,7 +17,7 @@ jobs:
       - name: Install conversion dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y osmium-tool libboost-system-dev libboost-filesystem-dev libboost-program-options-dev liblua5.3-dev libshp-dev libsqlite3-dev
+          sudo apt-get install -y osmium-tool libboost-system-dev libboost-filesystem-dev libboost-program-options-dev rapidjson-dev liblua5.3-dev libshp-dev libsqlite3-dev
           git clone --depth 1 https://github.com/systemed/tilemaker.git "$RUNNER_TEMP/tilemaker"
           cmake -S "$RUNNER_TEMP/tilemaker" -B "$RUNNER_TEMP/tilemaker/build" -DCMAKE_BUILD_TYPE=Release
           cmake --build "$RUNNER_TEMP/tilemaker/build" --parallel 2
