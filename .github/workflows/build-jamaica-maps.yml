@@ -28,7 +28,7 @@ jobs:
           curl --fail --location --retry 3 --output Maps/jamaica.osm.pbf https://download.geofabrik.de/central-america/jamaica-latest.osm.pbf
       - name: Build MBTiles and offline search database
         shell: pwsh
-        run: ./scripts/build-region.ps1 -RegionId jamaica -InputPbf ./Maps/jamaica.osm.pbf
+        run: ./scripts/build-region.ps1 -RegionId jamaica -InputPbf ./Maps/jamaica.osm.pbf -TilemakerConfig "$env:RUNNER_TEMP/tilemaker/resources/config-openmaptiles.json" -TilemakerProcess "$env:RUNNER_TEMP/tilemaker/resources/process-openmaptiles.lua"
       - name: Upload generated map package
         uses: actions/upload-artifact@v4
         with:

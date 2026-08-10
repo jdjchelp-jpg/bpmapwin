@@ -1,7 +1,9 @@
 param(
     [string]$RegionId = "jamaica",
     [string]$InputPbf = "$(Join-Path $PSScriptRoot '..\Maps\jamaica.osm.pbf')",
-    [string]$OutputRoot = "$(Join-Path $PSScriptRoot '..\Maps\jamaica')"
+    [string]$OutputRoot = "$(Join-Path $PSScriptRoot '..\Maps\jamaica')",
+    [string]$TilemakerConfig = "$(Join-Path $PSScriptRoot 'tilemaker-config.json')",
+    [string]$TilemakerProcess = "$(Join-Path $PSScriptRoot 'tilemaker-process.lua')"
 )
 $ErrorActionPreference = 'Stop'
 $PSNativeCommandUseErrorActionPreference = $true
@@ -16,6 +18,7 @@ if (-not (Test-Path -LiteralPath $InputPbf)) { throw "PBF not found: $InputPbf" 
 Require-Command "osmium"
 Require-Command "tilemaker"
 Require-Command "python"
+osmium fileinfo $InputPbf
 
 New-Item -ItemType Directory -Force -Path $OutputRoot | Out-Null
 $searchGeoJson = Join-Path $OutputRoot "$RegionId-search.geojson"
@@ -29,7 +32,7 @@ osmium export $searchPbf -o $searchGeoJson --overwrite
 python (Join-Path $PSScriptRoot 'import-search.py') $searchGeoJson $searchDb
 
 Write-Host "[2/3] Building MapLibre vector tiles..."
-tilemaker --input $InputPbf --output $tiles --config (Join-Path $PSScriptRoot 'tilemaker-config.json') --process (Join-Path $PSScriptRoot 'tilemaker-process.lua') --store $OutputRoot
+tilemaker --input $InputPbf --output $tiles --config $TilemakerConfig --process $TilemakerProcess --store $OutputRoot
 
 Write-Host "[3/3] Routing graph..."
 Write-Host "Routing graph generation is delegated to the selected engine. For Itinero, run the RegionGraphBuilder project after installing the .NET SDK; for OSRM, use its extract/partition/customize commands."
