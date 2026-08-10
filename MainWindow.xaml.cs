@@ -1,5 +1,6 @@
 using System.IO;
 using System.Windows;
+using OfflineMaps.Win.Core;
 
 namespace OfflineMaps.Win;
 
@@ -7,17 +8,24 @@ public partial class MainWindow : Window
 {
     private readonly OfflineMapControl _map;
     private readonly string _mapsDirectory = Path.Combine(AppContext.BaseDirectory, "Maps");
+    private readonly OfflineSearchService? _search;
 
     public MainWindow()
     {
         InitializeComponent();
         Directory.CreateDirectory(_mapsDirectory);
-        _map = new OfflineMapControl(_mapsDirectory);
+        var package = OfflinePackageLocator.Find(AppContext.BaseDirectory, "jamaica");
+        _map = new OfflineMapControl(package.Directory);
         _map.Initialize();
         MapStatus.Text = _map.Status;
+        if (package.SearchDatabasePath is not null) _search = new OfflineSearchService(package.SearchDatabasePath);
     }
 
-    private void SearchBox_OnTextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e) { }
+    private async void SearchBox_OnTextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+    {
+        if (_search is null) return;
+        SearchResults.ItemsSource = await _search.SearchAsync(SearchBox.Text);
+    }
     private void DownloadRegion_OnClick(object sender, RoutedEventArgs e) => MessageBox.Show("Region download is the next module. Add an MBTiles package to the Maps folder for this starter.", "Offline Maps");
     private void RecordVoice_OnClick(object sender, RoutedEventArgs e) => MessageBox.Show("Voice recording will create a reusable prompt pack. Record each prompt in a quiet room, preview it, then validate before enabling it for navigation.", "Voice guidance");
     private void ZoomIn_OnClick(object sender, RoutedEventArgs e) => _map.Zoom(1);

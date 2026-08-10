@@ -12,6 +12,7 @@
           <TextBlock Text="Maps, search, and navigation without a connection" TextWrapping="Wrap" Foreground="#60758A" Margin="0,4,0,22"/>
           <TextBlock Text="SEARCH" FontSize="11" FontWeight="Bold" Foreground="#60758A"/>
           <TextBox x:Name="SearchBox" Height="38" Margin="0,6,0,20" Padding="10" TextChanged="SearchBox_OnTextChanged"/>
+          <ListBox x:Name="SearchResults" Height="150" Margin="0,0,0,16" BorderBrush="#D7E0EA" DisplayMemberPath="Name"/>
           <TextBlock Text="VOICE GUIDANCE" FontSize="11" FontWeight="Bold" Foreground="#60758A"/>
           <ComboBox x:Name="VoiceModeBox" Height="34" Margin="0,6,0,8" SelectedIndex="0">
             <ComboBoxItem Content="Natural Windows voice"/>
