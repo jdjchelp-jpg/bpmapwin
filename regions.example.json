@@ -2,8 +2,8 @@
   {
     "id": "jamaica",
     "displayName": "Jamaica",
-    "sizeBytes": 0,
-    "downloadUrl": "https://your-map-catalog.example/maps/jamaica.mbtiles",
-    "sha256": "REPLACE_WITH_SIGNED_SHA256"
+    "sizeBytes": 38600000,
+    "downloadUrl": "https://download.geofabrik.de/central-america/jamaica-latest.osm.pbf",
+    "sha256": ""
   }
 ]

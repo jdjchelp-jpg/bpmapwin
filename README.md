@@ -44,6 +44,16 @@ The new `Core/OfflineContracts.cs` file defines the seams for the C++ map engine
 
 `Core/RegionDownloadService.cs` now provides resumable package download, SHA-256 verification, and atomic installation. Replace the placeholder URL and hash in `regions.example.json` with a catalog hosted by your own release pipeline; never ship a catalog with unverifiable packages.
 
+### Try the Jamaica download now
+
+1. Copy `regions.example.json` to `regions.json`.
+2. Point the service `HttpClient.BaseAddress` at the folder containing `regions.json`, or temporarily load the JSON from disk.
+3. Call `DownloadAsync` with the Jamaica entry. The file will be saved under `Maps/jamaica.osm.pbf`.
+
+The Geofabrik Jamaica extract is a valid OSM PBF source and is currently listed on its regional download page ([Jamaica extract](https://download.geofabrik.de/central-america/jamaica.html)). An empty `sha256` is supported only for development. Before releasing the app, obtain the published checksum and require it.
+
+Important: the downloaded PBF is source data; MapLibre still needs a generated MBTiles/PMTiles vector-tile package. The next conversion step should generate rendering tiles, the FTS5 search database, and the routing graph from this PBF.
+
 ## Build
 
 The environment used to generate this starter has the .NET runtime but not the .NET SDK. On a Windows machine with the .NET 8 SDK installed:

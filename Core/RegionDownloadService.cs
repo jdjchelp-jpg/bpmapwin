@@ -26,7 +26,9 @@ public sealed class RegionDownloadService : IRegionDownloadService
 
     public async Task<MapPackage> DownloadAsync(MapRegion region, IProgress<double>? progress = null, CancellationToken cancellationToken = default)
     {
-        var finalPath = Path.Combine(_directory, $"{region.Id}.mbtiles");
+        var extension = Path.GetExtension(new Uri(region.DownloadUrl).AbsolutePath);
+        if (string.IsNullOrWhiteSpace(extension)) extension = ".osm.pbf";
+        var finalPath = Path.Combine(_directory, $"{region.Id}{extension}");
         var partialPath = finalPath + ".partial";
         var existing = File.Exists(partialPath) ? new FileInfo(partialPath).Length : 0;
 
@@ -57,11 +59,11 @@ public sealed class RegionDownloadService : IRegionDownloadService
 
         await using var completed = File.OpenRead(partialPath);
         var hash = Convert.ToHexString(await SHA256.HashDataAsync(completed, cancellationToken));
-        if (!hash.Equals(region.Sha256, StringComparison.OrdinalIgnoreCase))
+        if (!string.IsNullOrWhiteSpace(region.Sha256) && !hash.Equals(region.Sha256, StringComparison.OrdinalIgnoreCase))
             throw new InvalidDataException($"Checksum mismatch for {region.DisplayName}. Expected {region.Sha256}, got {hash}.");
 
         File.Move(partialPath, finalPath, true);
-        var package = new MapPackage(region.Id, finalPath, "mbtiles", "1", true);
+        var package = new MapPackage(region.Id, finalPath, extension.TrimStart('.'), "1", string.IsNullOrWhiteSpace(region.Sha256) || hash.Equals(region.Sha256, StringComparison.OrdinalIgnoreCase));
         await File.WriteAllTextAsync(Path.Combine(_directory, $"{region.Id}.json"), JsonSerializer.Serialize(package, _json), cancellationToken);
         return package;
     }
