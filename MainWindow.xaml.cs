@@ -24,7 +24,16 @@ public partial class MainWindow : Window
             Path.Combine(AppContext.BaseDirectory, "Native", "MapLibreBridge.dll")
         }.FirstOrDefault(File.Exists);
         if (package.TilesPath is not null && bridgePath is not null)
-            MapSurface.Child = new NativeMapHost { Package = package };
+        {
+            try
+            {
+                MapSurface.Child = new NativeMapHost { Package = package };
+            }
+            catch (Exception ex) when (ex is DllNotFoundException or EntryPointNotFoundException or BadImageFormatException)
+            {
+                MapStatus.Text = "Offline package found, but the native map bridge could not load. Check MapLibreBridge.dll and its dependencies.";
+            }
+        }
         if (package.SearchDatabasePath is not null) _search = new OfflineSearchService(package.SearchDatabasePath);
     }
 
