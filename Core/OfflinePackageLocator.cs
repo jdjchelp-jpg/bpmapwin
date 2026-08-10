@@ -3,6 +3,7 @@ namespace OfflineMaps.Win.Core;
 public sealed record OfflinePackage(string Directory, string? TilesPath, string? SearchDatabasePath, string? ManifestPath)
 {
     public bool IsReady => TilesPath is not null && SearchDatabasePath is not null;
+    public string StylePath => Path.Combine(Directory, "jamaica-style.json");
 }
 
 public static class OfflinePackageLocator

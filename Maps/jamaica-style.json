@@ -1,0 +1,16 @@
+{
+  "version": 8,
+  "name": "Jamaica Offline",
+  "sources": {
+    "jamaica": {
+      "type": "vector",
+      "url": "mbtiles://C:/PATH/TO/jamaica.mbtiles"
+    }
+  },
+  "layers": [
+    { "id": "land", "type": "background", "paint": { "background-color": "#e8eef5" } },
+    { "id": "roads", "type": "line", "source": "jamaica", "source-layer": "transportation", "paint": { "line-color": "#ffffff", "line-width": 1.5 } },
+    { "id": "road-names", "type": "symbol", "source": "jamaica", "source-layer": "transportation_name", "layout": { "text-field": ["get", "name:latin"], "text-size": 11 }, "paint": { "text-color": "#36556d" } },
+    { "id": "places", "type": "symbol", "source": "jamaica", "source-layer": "place", "layout": { "text-field": ["get", "name:latin"], "text-size": 13 }, "paint": { "text-color": "#12304a" } }
+  ]
+}

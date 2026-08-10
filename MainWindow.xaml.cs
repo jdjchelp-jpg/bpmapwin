@@ -15,7 +15,7 @@ public partial class MainWindow : Window
         InitializeComponent();
         Directory.CreateDirectory(_mapsDirectory);
         var package = OfflinePackageLocator.Find(AppContext.BaseDirectory, "jamaica");
-        _map = new OfflineMapControl(package.Directory);
+        _map = new OfflineMapControl(package.Directory, package.TilesPath);
         _map.Initialize();
         MapStatus.Text = _map.Status;
         if (package.SearchDatabasePath is not null) _search = new OfflineSearchService(package.SearchDatabasePath);
@@ -35,9 +35,10 @@ public partial class MainWindow : Window
 public sealed class OfflineMapControl
 {
     private readonly string _mapDirectory;
+    private readonly string? _tilesPath;
     public string Status { get; private set; } = "Not initialized";
     public double ZoomLevel { get; private set; } = 10;
-    public OfflineMapControl(string mapDirectory) => _mapDirectory = mapDirectory;
+    public OfflineMapControl(string mapDirectory, string? tilesPath = null) { _mapDirectory = mapDirectory; _tilesPath = tilesPath; }
     public void Initialize()
     {
         var packages = Directory.EnumerateFiles(_mapDirectory, "*.mbtiles").ToArray();
