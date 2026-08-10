@@ -17,7 +17,7 @@ public static class OfflinePackageLocator
             Path.Combine(appDirectory, "Maps", regionId + "-offline-map")
         };
         var directory = candidates.FirstOrDefault(Directory.Exists) ?? candidates[0];
-        string? Find(string pattern) => Directory.Exists(directory) ? Directory.EnumerateFiles(directory, pattern).FirstOrDefault() : null;
+        string? Find(string pattern) => Directory.Exists(directory) ? Directory.EnumerateFiles(directory, pattern, SearchOption.AllDirectories).FirstOrDefault() : null;
         return new(directory, Find("*.mbtiles"), Find("*-search.sqlite"), Find("manifest.json"));
     }
 }

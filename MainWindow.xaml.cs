@@ -48,7 +48,7 @@ public sealed class OfflineMapControl
     public OfflineMapControl(string mapDirectory, string? tilesPath = null) { _mapDirectory = mapDirectory; _tilesPath = tilesPath; }
     public void Initialize()
     {
-        var packages = Directory.EnumerateFiles(_mapDirectory, "*.mbtiles").ToArray();
+        var packages = Directory.EnumerateFiles(_mapDirectory, "*.mbtiles", SearchOption.AllDirectories).ToArray();
         Status = packages.Length == 0 ? "Place an MBTiles package in the Maps folder to render it." : $"Found {packages.Length} offline map package(s).";
         // Production adapter: bind Mapsui.MapControl here and add an MBTiles vector-tile layer.
     }
