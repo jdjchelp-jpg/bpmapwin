@@ -29,7 +29,7 @@ osmium export $searchPbf -o $searchGeoJson --overwrite
 python (Join-Path $PSScriptRoot 'import-search.py') $searchGeoJson $searchDb
 
 Write-Host "[2/3] Building MapLibre vector tiles..."
-tilemaker --input $InputPbf --output $tiles --config (Join-Path $PSScriptRoot 'tilemaker-config.json') --process (Join-Path $PSScriptRoot 'tilemaker-process.lua')
+tilemaker --input $InputPbf --output $tiles --config (Join-Path $PSScriptRoot 'tilemaker-config.json') --process (Join-Path $PSScriptRoot 'tilemaker-process.lua') --store $OutputRoot
 
 Write-Host "[3/3] Routing graph..."
 Write-Host "Routing graph generation is delegated to the selected engine. For Itinero, run the RegionGraphBuilder project after installing the .NET SDK; for OSRM, use its extract/partition/customize commands."
