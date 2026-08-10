@@ -65,4 +65,4 @@ dotnet run --project .\OfflineMaps.Win.csproj
 
 ## Build with GitHub Actions
 
-You do not need Osmium or Tilemaker installed locally. In GitHub, open **Actions**, select **Build Jamaica offline map**, choose **Run workflow**, and download the generated `jamaica-offline-map` artifact when it finishes. The workflow also refreshes the extract monthly.
+You do not need Osmium or Tilemaker installed locally. In GitHub, open **Actions**, select **Build Jamaica offline map**, choose **Run workflow**, select `jamaica` or `cayman-islands`, and download the generated region artifact when it finishes. Jamaica uses Geofabrik; Cayman Islands uses the current Cayman PBF extract published by GEO2day. Both are OSM-derived and subject to the ODbL attribution requirements. [Cayman extract](https://geo2day.com/central_america/cayman_islands.html)

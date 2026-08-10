@@ -2,6 +2,15 @@ name: Build Jamaica offline map
 
 on:
   workflow_dispatch:
+    inputs:
+      region:
+        description: Region to build
+        required: true
+        default: jamaica
+        type: choice
+        options:
+          - jamaica
+          - cayman-islands
   schedule:
     - cron: '0 4 1 * *'
 
@@ -25,14 +34,22 @@ jobs:
       - name: Download OSM PBF
         run: |
           mkdir -p Maps
-          curl --fail --location --retry 3 --output Maps/jamaica.osm.pbf https://download.geofabrik.de/central-america/jamaica-latest.osm.pbf
+          region='${{ inputs.region || 'jamaica' }}'
+          if [ "$region" = "cayman-islands" ]; then
+            url='https://geo2day.com/central_america/cayman_islands.pbf'
+          else
+            url='https://download.geofabrik.de/central-america/jamaica-latest.osm.pbf'
+          fi
+          curl --fail --location --retry 3 --output "Maps/$region.osm.pbf" "$url"
       - name: Build MBTiles and offline search database
         shell: pwsh
-        run: ./scripts/build-region.ps1 -RegionId jamaica -InputPbf ./Maps/jamaica.osm.pbf -TilemakerConfig "$env:RUNNER_TEMP/tilemaker/resources/config-openmaptiles.json" -TilemakerProcess "$env:RUNNER_TEMP/tilemaker/resources/process-openmaptiles.lua"
+        run: |
+          $region = "${{ inputs.region || 'jamaica' }}"
+          ./scripts/build-region.ps1 -RegionId $region -InputPbf "./Maps/$region.osm.pbf" -TilemakerConfig "$env:RUNNER_TEMP/tilemaker/resources/config-openmaptiles.json" -TilemakerProcess "$env:RUNNER_TEMP/tilemaker/resources/process-openmaptiles.lua"
       - name: Upload generated map package
         uses: actions/upload-artifact@v4
         with:
-          name: jamaica-offline-map
-          path: Maps/jamaica/
+          name: ${{ inputs.region || 'jamaica' }}-offline-map
+          path: Maps/${{ inputs.region || 'jamaica' }}/
           if-no-files-found: error
           retention-days: 14
