@@ -62,3 +62,7 @@ The environment used to generate this starter has the .NET runtime but not the .
 dotnet build .\OfflineMaps.Win.csproj
 dotnet run --project .\OfflineMaps.Win.csproj
 ```
+
+## Build with GitHub Actions
+
+You do not need Osmium or Tilemaker installed locally. In GitHub, open **Actions**, select **Build Jamaica offline map**, choose **Run workflow**, and download the generated `jamaica-offline-map` artifact when it finishes. The workflow also refreshes the extract monthly.

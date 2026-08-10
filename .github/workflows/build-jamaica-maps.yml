@@ -1,0 +1,38 @@
+name: Build Jamaica offline map
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 4 1 * *'
+
+permissions:
+  contents: read
+
+jobs:
+  build-region:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out project
+        uses: actions/checkout@v4
+      - name: Install conversion dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y osmium-tool libboost-system-dev libboost-filesystem-dev liblua5.3-dev libshp-dev libsqlite3-dev
+          git clone --depth 1 https://github.com/systemed/tilemaker.git "$RUNNER_TEMP/tilemaker"
+          cmake -S "$RUNNER_TEMP/tilemaker" -B "$RUNNER_TEMP/tilemaker/build" -DCMAKE_BUILD_TYPE=Release
+          cmake --build "$RUNNER_TEMP/tilemaker/build" --parallel 2
+          echo "$RUNNER_TEMP/tilemaker/build" >> "$GITHUB_PATH"
+      - name: Download OSM PBF
+        run: |
+          mkdir -p Maps
+          curl --fail --location --retry 3 --output Maps/jamaica.osm.pbf https://download.geofabrik.de/central-america/jamaica-latest.osm.pbf
+      - name: Build MBTiles and offline search database
+        shell: pwsh
+        run: ./scripts/build-region.ps1 -RegionId jamaica -InputPbf ./Maps/jamaica.osm.pbf
+      - name: Upload generated map package
+        uses: actions/upload-artifact@v4
+        with:
+          name: jamaica-offline-map
+          path: Maps/jamaica/
+          if-no-files-found: error
+          retention-days: 14
