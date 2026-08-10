@@ -1,4 +1,4 @@
 {
-  "settings": { "minzoom": 0, "maxzoom": 14, "basezoom": 14, "include_ids": true },
+  "settings": { "minzoom": 0, "maxzoom": 14, "basezoom": 14, "include_ids": true, "compress": "gzip" },
   "layers": { "transportation": { "minzoom": 4 }, "water": { "minzoom": 0 }, "landuse": { "minzoom": 8 }, "poi": { "minzoom": 12 } }
 }
