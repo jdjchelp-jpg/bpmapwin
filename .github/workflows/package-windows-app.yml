@@ -1,0 +1,96 @@
+name: Package Offline Maps Windows app
+
+on:
+  workflow_dispatch:
+    inputs:
+      region:
+        description: Region to package
+        required: true
+        default: cayman-islands
+        type: choice
+        options: [jamaica, cayman-islands]
+
+permissions:
+  contents: read
+
+jobs:
+  map:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install map tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y osmium-tool libboost-system-dev libboost-filesystem-dev libboost-program-options-dev rapidjson-dev liblua5.3-dev libshp-dev libsqlite3-dev
+          git clone --depth 1 https://github.com/systemed/tilemaker.git "$RUNNER_TEMP/tilemaker"
+          cmake -S "$RUNNER_TEMP/tilemaker" -B "$RUNNER_TEMP/tilemaker/build" -DCMAKE_BUILD_TYPE=Release
+          cmake --build "$RUNNER_TEMP/tilemaker/build" --parallel 2
+          echo "$RUNNER_TEMP/tilemaker/build" >> "$GITHUB_PATH"
+      - name: Download source PBF
+        run: |
+          mkdir -p Maps
+          region='${{ inputs.region }}'
+          if [ "$region" = "cayman-islands" ]; then url='https://geo2day.com/central_america/cayman_islands.pbf'; else url='https://download.geofabrik.de/central-america/jamaica-latest.osm.pbf'; fi
+          curl --fail --location --retry 3 --output "Maps/$region.osm.pbf" "$url"
+      - name: Build map package
+        shell: pwsh
+        run: ./scripts/build-region.ps1 -RegionId "${{ inputs.region }}" -InputPbf "./Maps/${{ inputs.region }}.osm.pbf" -TilemakerConfig "$env:RUNNER_TEMP/tilemaker/resources/config-openmaptiles.json" -TilemakerProcess "$env:RUNNER_TEMP/tilemaker/resources/process-openmaptiles.lua"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: region-package
+          path: Maps/${{ inputs.region }}/
+
+  native:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - uses: lukka/get-cmake@latest
+      - uses: ilammy/msvc-dev-cmd@v1
+        with: { arch: x64 }
+      - name: Checkout MapLibre Native
+        shell: pwsh
+        run: |
+          git config --global core.longpaths true
+          New-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem' -Name LongPathsEnabled -Value 1 -PropertyType DWord -Force | Out-Null
+          git -c core.longpaths=true clone --recurse-submodules --depth 1 https://github.com/maplibre/maplibre-native.git $env:RUNNER_TEMP\maplibre-native
+      - name: Build native bridge
+        shell: pwsh
+        run: |
+          Set-Location $env:RUNNER_TEMP\maplibre-native
+          $env:CC = 'cl'; $env:CXX = 'cl'
+          cmake --preset windows-opengl
+          cmake --build $env:RUNNER_TEMP\maplibre-native\build-windows-opengl --config Release
+          Set-Location $env:GITHUB_WORKSPACE
+          & "$env:VCPKG_INSTALLATION_ROOT\vcpkg.exe" install sqlite3:x64-windows
+          cmake -S Native -B Native\build -DCMAKE_BUILD_TYPE=Release -A x64 -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT\scripts\buildsystems\vcpkg.cmake"
+          cmake --build Native\build --config Release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: native-bridge
+          path: Native/build/Release/MapLibreBridge.dll
+
+  package:
+    needs: [map, native]
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with: { dotnet-version: '8.0.x' }
+      - uses: actions/download-artifact@v4
+        with: { name: region-package, path: Maps/${{ inputs.region }} }
+      - uses: actions/download-artifact@v4
+        with: { name: native-bridge, path: Native }
+      - name: Publish WPF app
+        shell: pwsh
+        run: dotnet publish .\OfflineMaps.Win.csproj -c Release -r win-x64 --self-contained false -o .\publish
+      - name: Assemble package
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force publish\Native, publish\Maps\${{ inputs.region }} | Out-Null
+          Copy-Item Native\MapLibreBridge.dll publish\Native\MapLibreBridge.dll -Force
+          Copy-Item Maps\${{ inputs.region }} publish\Maps\${{ inputs.region }} -Recurse -Force
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bpmapwin-${{ inputs.region }}-windows
+          path: publish/
+          retention-days: 14
