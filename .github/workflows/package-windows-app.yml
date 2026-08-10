@@ -48,6 +48,7 @@ jobs:
         run: |
           New-Item -ItemType Directory -Force publish\Native, publish\Maps\jamaica | Out-Null
           Copy-Item Native\MapLibreBridge.dll publish\Native\MapLibreBridge.dll -Force
+          Copy-Item Native\MapLibreBridge.dll publish\MapLibreBridge.dll -Force
           Copy-Item Maps\jamaica publish\Maps\jamaica -Recurse -Force
           Copy-Item Maps\jamaica-style.json publish\Maps\jamaica-style.json -Force
 
