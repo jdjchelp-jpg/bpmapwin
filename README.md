@@ -2,6 +2,24 @@
 
 A native WPF/.NET 8 starter for an offline OSM map application. The UI shell and local map-package discovery are implemented without requiring network access.
 
+## Engine direction
+
+For a C++-first production engine, use **MapLibre Native** for rendering and a small C++/CLI or C ABI bridge to WPF. Keep the bridge limited to lifecycle, camera, tile-source, and gesture calls. Use **OsmAnd C++ Core** instead if bundled search, routing, and navigation are more important than a minimal rendering stack; it is heavier but closer to a complete offline navigation product. Do not mix both engines in the first milestone.
+
+Recommended first milestone: MapLibre Native + MBTiles/vector tiles for rendering, a separate routing core, and SQLite/FTS5 for search.
+
+## Offline downloads and data
+
+The region catalog should return signed manifests, not arbitrary URLs. Each manifest contains region ID, display name, bounds, format, size, version, SHA-256, and required style metadata. Download to a `.partial` file, support HTTP range resume, verify SHA-256, atomically rename to the final package, and write an install record. Keep `.pbf` source extracts for building graphs/search indexes and `.mbtiles`/`.mvt` packages for fast map display; the renderer should not parse raw PBF on every startup.
+
+## Offline search
+
+Import each region into SQLite with FTS5. Use normalized `name`, `street`, `city`, and `category` columns plus latitude/longitude and a bounding-box index. Query suggestions locally with a debounce, rank exact prefix matches first, then street/city/POI matches, and never fall back to network geocoding.
+
+## Voice guidance and custom recordings
+
+`VoiceMode.SystemTextToSpeech` uses Windows speech synthesis for unlimited dynamic text. `VoiceMode.RecordedVoicePack` uses prerecorded clips for stable prompts such as `turn_left`, `turn_right`, `roundabout_exit_2`, `traffic_light`, `stop_sign`, `rerouting`, and distance units. Dynamic street names and distances can remain TTS, or the recorder can optionally capture number/unit clips. A voice pack should contain a manifest, WAV/PCM files, language metadata, version, and a validation report. The app must preview clips, permit re-recording, require all mandatory keys, and let users disable/delete packs. Avoid recording while driving; provide a hands-free test and volume preview before navigation.
+
 ## Recommended architecture
 
 - **UI:** WPF + MVVM, with `MainWindow` replaced by views/view-models as features grow.
@@ -21,6 +39,8 @@ Suggested database tables: `places(id, name, normalized_name, category, lat, lon
 4. **Routing:** build Itinero graphs per region and expose driving, walking, and cycling profiles.
 5. **Navigation:** generate spoken maneuver queues, read traffic controls/lanes from OSM, show HUD, and reroute on deviation.
 6. **Production hardening:** package signed regional data, migration/versioning, crash recovery, accessibility, and offline integration tests.
+
+The new `Core/OfflineContracts.cs` file defines the seams for the C++ map engine, region downloader, offline geocoder, and both TTS/recorded voice implementations. `Core/VoicePackManifest.cs` defines the portable voice-pack manifest format.
 
 ## Build
 

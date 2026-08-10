@@ -19,6 +19,7 @@ public partial class MainWindow : Window
 
     private void SearchBox_OnTextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e) { }
     private void DownloadRegion_OnClick(object sender, RoutedEventArgs e) => MessageBox.Show("Region download is the next module. Add an MBTiles package to the Maps folder for this starter.", "Offline Maps");
+    private void RecordVoice_OnClick(object sender, RoutedEventArgs e) => MessageBox.Show("Voice recording will create a reusable prompt pack. Record each prompt in a quiet room, preview it, then validate before enabling it for navigation.", "Voice guidance");
     private void ZoomIn_OnClick(object sender, RoutedEventArgs e) => _map.Zoom(1);
     private void ZoomOut_OnClick(object sender, RoutedEventArgs e) => _map.Zoom(-1);
 }
