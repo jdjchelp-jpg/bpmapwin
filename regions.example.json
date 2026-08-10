@@ -1,0 +1,9 @@
+[
+  {
+    "id": "jamaica",
+    "displayName": "Jamaica",
+    "sizeBytes": 0,
+    "downloadUrl": "https://your-map-catalog.example/maps/jamaica.mbtiles",
+    "sha256": "REPLACE_WITH_SIGNED_SHA256"
+  }
+]

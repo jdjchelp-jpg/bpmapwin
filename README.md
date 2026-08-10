@@ -42,6 +42,8 @@ Suggested database tables: `places(id, name, normalized_name, category, lat, lon
 
 The new `Core/OfflineContracts.cs` file defines the seams for the C++ map engine, region downloader, offline geocoder, and both TTS/recorded voice implementations. `Core/VoicePackManifest.cs` defines the portable voice-pack manifest format.
 
+`Core/RegionDownloadService.cs` now provides resumable package download, SHA-256 verification, and atomic installation. Replace the placeholder URL and hash in `regions.example.json` with a catalog hosted by your own release pipeline; never ship a catalog with unverifiable packages.
+
 ## Build
 
 The environment used to generate this starter has the .NET runtime but not the .NET SDK. On a Windows machine with the .NET 8 SDK installed:
