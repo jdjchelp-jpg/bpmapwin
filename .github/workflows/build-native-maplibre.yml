@@ -13,6 +13,10 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install CMake and Ninja
         uses: lukka/get-cmake@latest
+      - name: Initialize MSVC environment
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
       - name: Checkout MapLibre Native
         shell: pwsh
         run: |
@@ -23,6 +27,8 @@ jobs:
         shell: pwsh
         run: |
           Set-Location $env:RUNNER_TEMP\maplibre-native
+          $env:CC = "cl"
+          $env:CXX = "cl"
           cmake --list-presets
           cmake --preset windows-opengl
       - name: Build MapLibre Native
