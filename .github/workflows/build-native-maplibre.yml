@@ -15,7 +15,10 @@ jobs:
         uses: lukka/get-cmake@latest
       - name: Checkout MapLibre Native
         shell: pwsh
-        run: git clone --recurse-submodules --depth 1 https://github.com/maplibre/maplibre-native.git $env:RUNNER_TEMP\maplibre-native
+        run: |
+          git config --global core.longpaths true
+          New-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem' -Name LongPathsEnabled -Value 1 -PropertyType DWord -Force | Out-Null
+          git -c core.longpaths=true clone --recurse-submodules --depth 1 https://github.com/maplibre/maplibre-native.git $env:RUNNER_TEMP\maplibre-native
       - name: Configure MapLibre Native
         shell: pwsh
         run: |
