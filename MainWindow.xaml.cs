@@ -1,5 +1,7 @@
 using System.IO;
+using IOPath = System.IO.Path;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using OfflineMaps.Win.Core;
@@ -9,7 +11,7 @@ namespace OfflineMaps.Win;
 public partial class MainWindow : Window
 {
     private readonly OfflineMapControl _map;
-    private readonly string _mapsDirectory = Path.Combine(AppContext.BaseDirectory, "Maps");
+    private readonly string _mapsDirectory = IOPath.Combine(AppContext.BaseDirectory, "Maps");
     private readonly OfflineSearchService? _search;
     private OfflineRoutePlanner? _routePlanner;
 
@@ -24,8 +26,8 @@ public partial class MainWindow : Window
         DrawMapBackground();
         var bridgePath = new[]
         {
-            Path.Combine(AppContext.BaseDirectory, "MapLibreBridge.dll"),
-            Path.Combine(AppContext.BaseDirectory, "Native", "MapLibreBridge.dll")
+            IOPath.Combine(AppContext.BaseDirectory, "MapLibreBridge.dll"),
+            IOPath.Combine(AppContext.BaseDirectory, "Native", "MapLibreBridge.dll")
         }.FirstOrDefault(File.Exists);
         if (package.TilesPath is not null && bridgePath is not null)
         {
