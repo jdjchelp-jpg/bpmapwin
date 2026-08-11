@@ -8,8 +8,9 @@ mkdir -p "$ROOT"
 IMAGE="osrm/osrm-backend:latest"
 
 docker run --rm -t -v "$(pwd):/data" "$IMAGE" osrm-extract -p /opt/car.lua "/data/$PBF"
-docker run --rm -t -v "$(pwd):/data" "$IMAGE" osrm-partition "/data/$PBF.osrm"
-docker run --rm -t -v "$(pwd):/data" "$IMAGE" osrm-customize "/data/$PBF.osrm"
+GRAPH="${PBF%.osm.pbf}.osrm"
+docker run --rm -t -v "$(pwd):/data" "$IMAGE" osrm-partition "/data/$GRAPH"
+docker run --rm -t -v "$(pwd):/data" "$IMAGE" osrm-customize "/data/$GRAPH"
 
-mv "$PBF.osrm"* "$ROOT/"
+mv "$GRAPH"* "$ROOT/"
 echo "Routing graph created in $ROOT"
