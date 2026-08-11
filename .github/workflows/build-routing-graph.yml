@@ -20,8 +20,7 @@ jobs:
           path: Maps/jamaica
       - name: Build OSRM driving graph
         run: |
-          sudo apt-get update
-          sudo apt-get install -y docker.io
+          docker --version
           chmod +x scripts/build-routing.sh
           bash scripts/build-routing.sh jamaica Maps/jamaica/jamaica.osm.pbf Maps/jamaica
       - uses: actions/upload-artifact@v4
