@@ -56,8 +56,8 @@
     <Grid Grid.Column="2">
       <Border Background="#DCE8EF" CornerRadius="16" BorderBrush="#C7D8E4" BorderThickness="1">
         <Grid x:Name="MapHost">
-          <Border x:Name="MapSurface" Background="#DCE8EF" CornerRadius="16"/>
-          <Border HorizontalAlignment="Center" VerticalAlignment="Center" Background="#FFFFFF" Padding="24" CornerRadius="14" Opacity="0.96">
+          <Border x:Name="MapSurface" Background="#DCE8EF" CornerRadius="16"><Canvas x:Name="MapCanvas" ClipToBounds="True"/></Border>
+          <Border x:Name="MapEmptyState" HorizontalAlignment="Center" VerticalAlignment="Center" Background="#FFFFFF" Padding="24" CornerRadius="14" Opacity="0.96">
             <StackPanel><TextBlock Text="Offline map ready" FontSize="23" FontWeight="SemiBold" Foreground="{StaticResource Ink}" HorizontalAlignment="Center"/><TextBlock x:Name="MapStatus" Text="Your downloaded map is ready." Foreground="{StaticResource Muted}" Margin="0,8,0,0" HorizontalAlignment="Center"/></StackPanel>
           </Border>
           <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="20"><Button Content="＋" Width="42" Height="42" Click="ZoomIn_OnClick"/><Button Content="－" Width="42" Height="42" Margin="8,0,0,0" Click="ZoomOut_OnClick"/></StackPanel>
