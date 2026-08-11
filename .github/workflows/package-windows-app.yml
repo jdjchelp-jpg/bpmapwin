@@ -28,6 +28,14 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
+      - name: Download native bridge artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: native-bridge
+          run-id: ${{ inputs.artifact-run }}
+          github-token: ${{ github.token }}
+          path: Native
+
       - name: Download verified Jamaica map artifact
         uses: actions/download-artifact@v4
         with:
@@ -51,7 +59,9 @@ jobs:
       - name: Assemble Jamaica package
         shell: pwsh
         run: |
-          New-Item -ItemType Directory -Force publish\Maps\jamaica | Out-Null
+          New-Item -ItemType Directory -Force publish\Native, publish\Maps\jamaica | Out-Null
+          Copy-Item Native\MapLibreBridge.dll publish\MapLibreBridge.dll -Force
+          Copy-Item Native\MapLibreBridge.dll publish\Native\MapLibreBridge.dll -Force
           Copy-Item Maps\jamaica publish\Maps\jamaica -Recurse -Force
           Copy-Item Maps\jamaica-style.json publish\Maps\jamaica-style.json -Force
 
