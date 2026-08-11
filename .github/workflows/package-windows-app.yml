@@ -8,6 +8,11 @@ on:
         required: true
         default: '31437658426'
         type: string
+      routing-run:
+        description: Workflow run containing the Jamaica OSRM routing artifact
+        required: true
+        default: '31448419781'
+        type: string
 
 permissions:
   contents: read
@@ -28,6 +33,14 @@ jobs:
         with:
           name: region-package
           run-id: ${{ inputs.artifact-run }}
+          github-token: ${{ github.token }}
+          path: Maps/jamaica
+
+      - name: Download Jamaica driving graph artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: jamaica-routing-driving
+          run-id: ${{ inputs.routing-run }}
           github-token: ${{ github.token }}
           path: Maps/jamaica
 
