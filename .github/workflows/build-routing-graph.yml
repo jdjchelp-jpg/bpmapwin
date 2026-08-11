@@ -12,19 +12,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
-        with:
-          name: region-package
-          run-id: 31437658426
-          github-token: ${{ github.token }}
-          path: Maps/jamaica
       - name: Build OSRM driving graph
         run: |
           docker --version
           chmod +x scripts/build-routing.sh
-          pbf=$(find Maps -type f -name 'jamaica.osm.pbf' -print -quit)
-          test -n "$pbf"
-          echo "Using PBF: $pbf"
+          mkdir -p Maps
+          curl --fail --location --retry 3 --output Maps/jamaica.osm.pbf https://download.geofabrik.de/central-america/jamaica-latest.osm.pbf
+          pbf=Maps/jamaica.osm.pbf
           bash scripts/build-routing.sh jamaica "$pbf" Maps/jamaica
       - uses: actions/upload-artifact@v4
         with:
