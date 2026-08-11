@@ -1,4 +1,5 @@
 using System.IO;
+using System.Runtime.InteropServices;
 using IOPath = System.IO.Path;
 using System.Windows;
 using System.Windows.Controls;
@@ -29,8 +30,9 @@ public partial class MainWindow : Window
             IOPath.Combine(AppContext.BaseDirectory, "MapLibreBridge.dll"),
             IOPath.Combine(AppContext.BaseDirectory, "Native", "MapLibreBridge.dll")
         }.FirstOrDefault(File.Exists);
-        if (package.TilesPath is not null && bridgePath is not null)
+        if (package.TilesPath is not null && bridgePath is not null && NativeLibrary.TryLoad(bridgePath, out var nativeHandle))
         {
+            NativeLibrary.Free(nativeHandle);
             try
             {
                 MapSurface.Child = new NativeMapHost { Package = package };
@@ -39,6 +41,10 @@ public partial class MainWindow : Window
             {
                 MapStatus.Text = "Offline package found, but the native map bridge could not load. Check MapLibreBridge.dll and its dependencies.";
             }
+        }
+        else if (package.TilesPath is not null)
+        {
+            MapStatus.Text = "Offline package found. Native map renderer is unavailable; route preview mode is active.";
         }
         if (package.SearchDatabasePath is not null)
         {
