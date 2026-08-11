@@ -13,6 +13,12 @@
           <TextBlock Text="SEARCH" FontSize="11" FontWeight="Bold" Foreground="#60758A"/>
           <TextBox x:Name="SearchBox" Height="38" Margin="0,6,0,20" Padding="10" TextChanged="SearchBox_OnTextChanged"/>
           <ListBox x:Name="SearchResults" Height="150" Margin="0,0,0,16" BorderBrush="#D7E0EA" DisplayMemberPath="Name"/>
+          <TextBlock Text="TRIP PLANNER" FontSize="11" FontWeight="Bold" Foreground="#60758A"/>
+          <TextBox x:Name="StartBox" Height="34" Margin="0,6,0,6" Padding="8" ToolTip="Start: place name or latitude,longitude"/>
+          <TextBox x:Name="DestinationBox" Height="34" Margin="0,0,0,6" Padding="8" ToolTip="Destination: place name or latitude,longitude"/>
+          <TextBox x:Name="StopsBox" Height="34" Margin="0,0,0,6" Padding="8" ToolTip="Optional stops separated by semicolons"/>
+          <Button Content="Calculate route" Height="36" Click="CalculateRoute_OnClick"/>
+          <TextBlock x:Name="RouteStatus" Text="Add a start and destination. Optional stops use semicolons." TextWrapping="Wrap" Foreground="#60758A" Margin="0,8,0,18"/>
           <TextBlock Text="VOICE GUIDANCE" FontSize="11" FontWeight="Bold" Foreground="#60758A"/>
           <ComboBox x:Name="VoiceModeBox" Height="34" Margin="0,6,0,8" SelectedIndex="0">
             <ComboBoxItem Content="Natural Windows voice"/>

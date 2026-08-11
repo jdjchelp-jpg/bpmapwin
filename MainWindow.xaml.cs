@@ -9,6 +9,7 @@ public partial class MainWindow : Window
     private readonly OfflineMapControl _map;
     private readonly string _mapsDirectory = Path.Combine(AppContext.BaseDirectory, "Maps");
     private readonly OfflineSearchService? _search;
+    private OfflineRoutePlanner? _routePlanner;
 
     public MainWindow()
     {
@@ -34,13 +35,25 @@ public partial class MainWindow : Window
                 MapStatus.Text = "Offline package found, but the native map bridge could not load. Check MapLibreBridge.dll and its dependencies.";
             }
         }
-        if (package.SearchDatabasePath is not null) _search = new OfflineSearchService(package.SearchDatabasePath);
+        if (package.SearchDatabasePath is not null)
+        {
+            _search = new OfflineSearchService(package.SearchDatabasePath);
+            _routePlanner = new OfflineRoutePlanner(_search);
+        }
     }
 
     private async void SearchBox_OnTextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
     {
         if (_search is null) return;
         SearchResults.ItemsSource = await _search.SearchAsync(SearchBox.Text);
+    }
+    private async void CalculateRoute_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (_routePlanner is null) { RouteStatus.Text = "Offline search database is not available."; return; }
+        if (string.IsNullOrWhiteSpace(StartBox.Text) || string.IsNullOrWhiteSpace(DestinationBox.Text)) { RouteStatus.Text = "Enter both a start and destination."; return; }
+        var stops = StopsBox.Text.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        var plan = await _routePlanner.PlanAsync(StartBox.Text, stops, DestinationBox.Text);
+        RouteStatus.Text = plan is null ? "Start or destination was not found offline." : $"Preview: {plan.DistanceKm:F1} km. {plan.Status}";
     }
     private void DownloadRegion_OnClick(object sender, RoutedEventArgs e) => MessageBox.Show("Region download is the next module. Add an MBTiles package to the Maps folder for this starter.", "Offline Maps");
     private void RecordVoice_OnClick(object sender, RoutedEventArgs e) => MessageBox.Show("Voice recording will create a reusable prompt pack. Record each prompt in a quiet room, preview it, then validate before enabling it for navigation.", "Voice guidance");
