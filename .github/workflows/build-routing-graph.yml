@@ -1,0 +1,31 @@
+name: Build offline driving graph
+
+on:
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  routing:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: region-package
+          run-id: 31437658426
+          github-token: ${{ github.token }}
+          path: Maps/jamaica
+      - name: Build OSRM driving graph
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker.io
+          chmod +x scripts/build-routing.sh
+          bash scripts/build-routing.sh jamaica Maps/jamaica/jamaica.osm.pbf Maps/jamaica
+      - uses: actions/upload-artifact@v4
+        with:
+          name: jamaica-routing-driving
+          path: Maps/jamaica/*.osrm*
+          retention-days: 14
