@@ -22,7 +22,10 @@ jobs:
         run: |
           docker --version
           chmod +x scripts/build-routing.sh
-          bash scripts/build-routing.sh jamaica Maps/jamaica/jamaica.osm.pbf Maps/jamaica
+          pbf=$(find Maps -type f -name 'jamaica.osm.pbf' -print -quit)
+          test -n "$pbf"
+          echo "Using PBF: $pbf"
+          bash scripts/build-routing.sh jamaica "$pbf" Maps/jamaica
       - uses: actions/upload-artifact@v4
         with:
           name: jamaica-routing-driving
