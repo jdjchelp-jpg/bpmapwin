@@ -1,59 +1,68 @@
 <Window x:Class="OfflineMaps.Win.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Offline Maps" Width="1280" Height="800" MinWidth="960" MinHeight="640"
-        Background="#E8EEF5">
-  <Grid>
-    <Grid.ColumnDefinitions><ColumnDefinition Width="300"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-    <Border Grid.Column="0" Background="{StaticResource PanelBrush}" BorderBrush="#D7E0EA" BorderThickness="0,0,1,0">
-      <DockPanel Margin="20">
-        <StackPanel DockPanel.Dock="Top">
-          <TextBlock Text="OFFLINE MAPS" FontSize="20" FontWeight="Bold" Foreground="#12304A"/>
-          <TextBlock Text="Maps, search, and navigation without a connection" TextWrapping="Wrap" Foreground="#60758A" Margin="0,4,0,22"/>
-          <TextBlock Text="SEARCH" FontSize="11" FontWeight="Bold" Foreground="#60758A"/>
-          <TextBox x:Name="SearchBox" Height="38" Margin="0,6,0,20" Padding="10" TextChanged="SearchBox_OnTextChanged"/>
-          <ListBox x:Name="SearchResults" Height="150" Margin="0,0,0,16" BorderBrush="#D7E0EA" DisplayMemberPath="Name"/>
-          <TextBlock Text="TRIP PLANNER" FontSize="11" FontWeight="Bold" Foreground="#60758A"/>
-          <TextBox x:Name="StartBox" Height="34" Margin="0,6,0,6" Padding="8" ToolTip="Start: place name or latitude,longitude"/>
-          <TextBox x:Name="DestinationBox" Height="34" Margin="0,0,0,6" Padding="8" ToolTip="Destination: place name or latitude,longitude"/>
-          <TextBox x:Name="StopsBox" Height="34" Margin="0,0,0,6" Padding="8" ToolTip="Optional stops separated by semicolons"/>
-          <Button Content="Calculate route" Height="36" Click="CalculateRoute_OnClick"/>
-          <TextBlock x:Name="RouteStatus" Text="Add a start and destination. Optional stops use semicolons." TextWrapping="Wrap" Foreground="#60758A" Margin="0,8,0,18"/>
-          <TextBlock Text="VOICE GUIDANCE" FontSize="11" FontWeight="Bold" Foreground="#60758A"/>
-          <ComboBox x:Name="VoiceModeBox" Height="34" Margin="0,6,0,8" SelectedIndex="0">
-            <ComboBoxItem Content="Natural Windows voice"/>
-            <ComboBoxItem Content="My recorded voice"/>
-          </ComboBox>
-          <Button Content="Record / manage voice prompts" Height="34" Click="RecordVoice_OnClick" Margin="0,0,0,20"/>
-          <TextBlock Text="DOWNLOADED REGIONS" FontSize="11" FontWeight="Bold" Foreground="#60758A"/>
-          <ListBox x:Name="RegionsList" Margin="0,8,0,0" BorderThickness="0" Background="Transparent">
-            <ListBoxItem Content="No regions downloaded yet" Foreground="#60758A"/>
-          </ListBox>
-        </StackPanel>
-        <StackPanel DockPanel.Dock="Bottom">
-          <Button Content="Download region" Height="40" Click="DownloadRegion_OnClick"/>
-          <TextBlock Text="Offline-first: network access is never required for map use." TextWrapping="Wrap" Foreground="#60758A" FontSize="11" Margin="0,12,0,0"/>
-        </StackPanel>
-      </DockPanel>
-    </Border>
-    <Grid Grid.Column="1">
-      <Border Margin="16" CornerRadius="10" Background="#DCE6EF" BorderBrush="#B8C9D8" BorderThickness="1">
-        <Grid x:Name="MapHost">
-          <Border x:Name="MapSurface" Background="#DCE6EF"/>
-          <Border HorizontalAlignment="Center" VerticalAlignment="Center" Background="#F8FAFC" Padding="22" CornerRadius="8" Opacity="0.94">
+        Title="Offline Maps" Width="1440" Height="900" MinWidth="1100" MinHeight="700"
+        Background="#EEF3F8" FontFamily="Segoe UI">
+  <Window.Resources>
+    <SolidColorBrush x:Key="Ink" Color="#12263A"/>
+    <SolidColorBrush x:Key="Muted" Color="#63788C"/>
+    <SolidColorBrush x:Key="Line" Color="#D9E3EC"/>
+    <SolidColorBrush x:Key="Card" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="Accent" Color="#0B7A75"/>
+    <Style TargetType="TextBox">
+      <Setter Property="BorderBrush" Value="#D6E0E8"/><Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="Background" Value="#F8FAFC"/><Setter Property="Foreground" Value="#162B3D"/>
+      <Setter Property="Padding" Value="12,9"/><Setter Property="FontSize" Value="13"/>
+      <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="TextBox"><Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="8"><ScrollViewer x:Name="PART_ContentHost"/></Border></ControlTemplate></Setter.Value></Setter>
+    </Style>
+    <Style TargetType="Button">
+      <Setter Property="Background" Value="#E8EEF3"/><Setter Property="Foreground" Value="#183148"/><Setter Property="BorderBrush" Value="#D1DDE6"/><Setter Property="BorderThickness" Value="1"/><Setter Property="FontSize" Value="13"/><Setter Property="Padding" Value="12,8"/>
+      <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Button"><Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="8"><ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/></Border></ControlTemplate></Setter.Value></Setter>
+      <Style.Triggers><Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="#DCE8EE"/></Trigger></Style.Triggers>
+    </Style>
+    <Style TargetType="ComboBox"><Setter Property="Height" Value="38"/><Setter Property="Background" Value="#F8FAFC"/><Setter Property="BorderBrush" Value="#D6E0E8"/><Setter Property="Padding" Value="10,4"/></Style>
+  </Window.Resources>
+  <Grid Margin="18">
+    <Grid.ColumnDefinitions><ColumnDefinition Width="350"/><ColumnDefinition Width="18"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+    <Border Grid.Column="0" Background="{StaticResource Card}" CornerRadius="16" BorderBrush="{StaticResource Line}" BorderThickness="1">
+      <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="24">
+          <DockPanel Margin="0,0,0,24">
+            <Border Width="42" Height="42" CornerRadius="12" Background="#DDF2EF" DockPanel.Dock="Left"><TextBlock Text="⌖" FontSize="26" Foreground="{StaticResource Accent}" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
+            <StackPanel Margin="12,0,0,0"><TextBlock Text="OFFLINE MAPS" FontSize="21" FontWeight="SemiBold" Foreground="{StaticResource Ink}"/><TextBlock Text="Private navigation, no signal required" FontSize="12" Foreground="{StaticResource Muted}" Margin="0,2,0,0"/></StackPanel>
+          </DockPanel>
+          <TextBlock Text="FIND A PLACE" FontSize="11" FontWeight="Bold" Foreground="{StaticResource Muted}" Margin="0,0,0,8"/>
+          <Grid><TextBox x:Name="SearchBox" Height="42" TextChanged="SearchBox_OnTextChanged"/><TextBlock Text="⌕" FontSize="20" Foreground="#8296A6" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,12,0" IsHitTestVisible="False"/></Grid>
+          <ListBox x:Name="SearchResults" Height="150" Margin="0,10,0,24" BorderBrush="{StaticResource Line}" Background="#FBFCFD" DisplayMemberPath="Name"/>
+          <Border Background="#F5F8FA" CornerRadius="12" Padding="16" Margin="0,0,0,18">
             <StackPanel>
-              <TextBlock Text="Offline map ready" FontSize="22" FontWeight="SemiBold" Foreground="#12304A" HorizontalAlignment="Center"/>
-              <TextBlock x:Name="MapStatus" Text="Place an MBTiles package in the Maps folder to render it." Foreground="#60758A" Margin="0,8,0,0" HorizontalAlignment="Center"/>
+              <DockPanel><TextBlock Text="PLAN A TRIP" FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource Ink}"/><TextBlock Text="OFFLINE" DockPanel.Dock="Right" FontSize="10" FontWeight="Bold" Foreground="{StaticResource Accent}" VerticalAlignment="Center"/></DockPanel>
+              <TextBlock Text="Start" FontSize="11" Foreground="{StaticResource Muted}" Margin="0,14,0,5"/><TextBox x:Name="StartBox" Height="38" ToolTip="Place name or latitude,longitude"/>
+              <TextBlock Text="Stops  ·  separate with semicolons" FontSize="11" Foreground="{StaticResource Muted}" Margin="0,10,0,5"/><TextBox x:Name="StopsBox" Height="38" ToolTip="Optional stops separated by semicolons"/>
+              <TextBlock Text="Destination" FontSize="11" Foreground="{StaticResource Muted}" Margin="0,10,0,5"/><TextBox x:Name="DestinationBox" Height="38" ToolTip="Place name or latitude,longitude"/>
+              <Button Content="Calculate route  →" Height="42" Margin="0,14,0,0" Background="{StaticResource Accent}" Foreground="White" BorderBrush="{StaticResource Accent}" Click="CalculateRoute_OnClick"/>
+              <TextBlock x:Name="RouteStatus" Text="Enter a start and destination to begin." TextWrapping="Wrap" Foreground="{StaticResource Muted}" FontSize="12" Margin="0,10,0,0"/>
             </StackPanel>
           </Border>
-          <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="16">
-            <Button Content="＋" Width="38" Height="38" Click="ZoomIn_OnClick"/>
-            <Button Content="－" Width="38" Height="38" Margin="6,0,0,0" Click="ZoomOut_OnClick"/>
-          </StackPanel>
+          <TextBlock Text="VOICE GUIDANCE" FontSize="11" FontWeight="Bold" Foreground="{StaticResource Muted}" Margin="0,0,0,8"/>
+          <ComboBox x:Name="VoiceModeBox" SelectedIndex="0" Margin="0,0,0,8"><ComboBoxItem Content="Natural Windows voice"/><ComboBoxItem Content="My recorded voice"/></ComboBox>
+          <Button Content="Record / manage voice prompts" Height="38" Click="RecordVoice_OnClick"/>
+          <DockPanel Margin="0,22,0,8"><TextBlock Text="DOWNLOADED REGIONS" FontSize="11" FontWeight="Bold" Foreground="{StaticResource Muted}"/><TextBlock Text="1 ready" DockPanel.Dock="Right" FontSize="11" Foreground="{StaticResource Accent}"/></DockPanel>
+          <ListBox x:Name="RegionsList" Height="54" BorderThickness="0" Background="Transparent"><ListBoxItem Content="Jamaica  ·  offline ready"/></ListBox>
+          <Button Content="＋  Download another region" Height="38" Click="DownloadRegion_OnClick"/>
+        </StackPanel>
+      </ScrollViewer>
+    </Border>
+    <Grid Grid.Column="2">
+      <Border Background="#DCE8EF" CornerRadius="16" BorderBrush="#C7D8E4" BorderThickness="1">
+        <Grid x:Name="MapHost">
+          <Border x:Name="MapSurface" Background="#DCE8EF" CornerRadius="16"/>
+          <Border HorizontalAlignment="Center" VerticalAlignment="Center" Background="#FFFFFF" Padding="24" CornerRadius="14" Opacity="0.96">
+            <StackPanel><TextBlock Text="Offline map ready" FontSize="23" FontWeight="SemiBold" Foreground="{StaticResource Ink}" HorizontalAlignment="Center"/><TextBlock x:Name="MapStatus" Text="Your downloaded map is ready." Foreground="{StaticResource Muted}" Margin="0,8,0,0" HorizontalAlignment="Center"/></StackPanel>
+          </Border>
+          <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="20"><Button Content="＋" Width="42" Height="42" Click="ZoomIn_OnClick"/><Button Content="－" Width="42" Height="42" Margin="8,0,0,0" Click="ZoomOut_OnClick"/></StackPanel>
+          <Border HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="20" Background="#FFFFFF" Padding="16" CornerRadius="12"><StackPanel><TextBlock Text="READY TO NAVIGATE" FontWeight="SemiBold" Foreground="{StaticResource Ink}"/><TextBlock Text="Set a destination to see your route." Foreground="{StaticResource Muted}" FontSize="12" Margin="0,3,0,0"/></StackPanel></Border>
         </Grid>
-      </Border>
-      <Border HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="34" Background="#F8FAFC" Padding="14" CornerRadius="8">
-        <StackPanel><TextBlock Text="READY TO NAVIGATE" FontWeight="Bold" Foreground="#12304A"/><TextBlock Text="Select a destination to calculate an offline route." Foreground="#60758A"/></StackPanel>
       </Border>
     </Grid>
   </Grid>
